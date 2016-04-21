@@ -10,13 +10,14 @@ namespace OdeToFood.Services
     {
         IEnumerable<Restaurant> GetAll();
         Restaurant Get(int id);
+        void Add(Restaurant newRestaraunt);
     }
 
     public class InMemoryRestarauntData : IRestarauntData
     {
-        private List<Restaurant> _restaurants;
+        static List<Restaurant> _restaurants;
 
-        public InMemoryRestarauntData()
+        static InMemoryRestarauntData()
         {
             _restaurants = new List<Restaurant>
             {
@@ -24,6 +25,12 @@ namespace OdeToFood.Services
                 new Restaurant { Id = 2 , Name = "Restaraunt 2"},
                 new Restaurant { Id = 3 , Name = "Restaraunt 3"}
             };
+        }
+
+        public void Add(Restaurant newRestaraunt)
+        {
+            newRestaraunt.Id = _restaurants.Max(r => r.Id) + 1;
+            _restaurants.Add(newRestaraunt);
         }
 
         public Restaurant Get(int id)
