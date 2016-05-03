@@ -9,6 +9,9 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Configuration;
 using OdeToFood.Services;
 using Microsoft.AspNet.Routing;
+using OdeToFood.Entities;
+using Microsoft.Data.Entity;
+using Microsoft.AspNet.Identity.EntityFramework;
 
 namespace OdeToFood
 {
@@ -27,8 +30,13 @@ namespace OdeToFood
         public void ConfigureServices(IServiceCollection services)
         {
             services.AddMvc();
+            services.AddEntityFramework().AddSqlServer().AddDbContext<OdeToFoodDbContext>(options => options.UseSqlServer(config["database:connection"]));
+
+            services.AddIdentity<User, IdentityRole>().AddEntityFrameworkStores<OdeToFoodDbContext>();
+
+
             services.AddSingleton<IGreeter, Greeter>();
-            services.AddScoped<IRestarauntData, InMemoryRestarauntData>();
+            services.AddScoped<IRestarauntData, SqlRestaurantData>();
             services.AddSingleton(provider => config);
         }
 
@@ -40,8 +48,13 @@ namespace OdeToFood
             {
                 app.UseDeveloperExceptionPage();
             }
+
             app.UseRuntimeInfoPage("/info");
+
             app.UseFileServer();
+
+            app.UseIdentity();
+
             app.UseMvc(ConfigureRoute);
 
             app.Run(async (context) =>
